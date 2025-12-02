@@ -42,3 +42,23 @@ class Customer {
     return true;
   }
 }
+
+class BookStore {
+  final List<Book> _inventory = [];
+  Map<String, double> revenueByAuthor = {};
+  void addBook(Book b) {
+    _inventory.add(b);
+  }
+
+  void removeBook(String id) {
+    _inventory.removeWhere((b) => b.id == id);
+  }
+
+  Book? searchByTitle(String keyword) {
+    try {
+      return _inventory.firstWhere((b) => b.title == keyword);
+    } catch (_) {
+      return null;
+    }
+  }
+}
