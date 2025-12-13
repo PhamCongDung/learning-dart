@@ -90,8 +90,9 @@ void main() {
   print("Test Case B");
   try {
     repo.add(User("2", "Dung", 33));
-  } on DuplicateIdException catch (e) {
+  } on DuplicateIdException catch (e, stack) {
     print(e);
+    print(stack);
   }
   // Case C
   print("Test Case C");
