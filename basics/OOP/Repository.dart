@@ -47,16 +47,16 @@ class UserRepository implements Repository<User> {
   User findByIdOrThrow(String id) {
     final index = _storage.indexWhere((u) => u.id == id);
     return index == -1
-        ? throw NotfoundException("Not Found : $id")
+        ? throw NotFoundException("Not Found : $id")
         : _storage[index];
   }
 
   void removeOrThrow(String id) {
     final index = _storage.indexWhere((u) => u.id == id);
     if (index == -1) {
-      throw NotfoundException("Not Found : $id");
+      throw NotFoundException("Not Found : $id");
     } else {
-      _storage.remove(id);
+      _storage.removeAt(index);
     }
   }
 }
@@ -69,9 +69,9 @@ class DuplicateIdException implements Exception {
   String toString() => message;
 }
 
-class NotfoundException implements Exception {
+class NotFoundException implements Exception {
   final String message;
-  NotfoundException(this.message);
+  NotFoundException(this.message);
   @override
   String toString() => message;
 }
@@ -87,8 +87,18 @@ void main() {
   repo.remove("1");
   print(repo.getAll());
   // Case B : Duplicate id
-  repo.add(User("2", "Dung", 33));
+  print("Test Case B");
+  try {
+    repo.add(User("2", "Dung", 33));
+  } on DuplicateIdException catch (e) {
+    print(e);
+  }
   // Case C
-  repo.findByIdOrThrow("5");
-  repo.removeOrThrow("100");
+  print("Test Case C");
+  try {
+    repo.findByIdOrThrow("5");
+    repo.removeOrThrow("100");
+  } on NotFoundException catch (e) {
+    print(e);
+  }
 }
