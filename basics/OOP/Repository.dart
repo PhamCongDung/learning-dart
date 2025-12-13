@@ -24,6 +24,9 @@ class UserRepository implements Repository<User> {
 
   @override
   void add(User user) {
+    if (_storage.any((x) => x.id == user.id)) {
+      throw DuplicateIdException("Duplicate id : ${user.id}");
+    }
     _storage.add(user);
   }
 
@@ -40,10 +43,42 @@ class UserRepository implements Repository<User> {
 
   @override
   List<User> getAll() => List.unmodifiable(_storage);
+
+  User findByIdOrThrow(String id) {
+    final index = _storage.indexWhere((u) => u.id == id);
+    return index == -1
+        ? throw NotfoundException("Not Found : $id")
+        : _storage[index];
+  }
+
+  void removeOrThrow(String id) {
+    final index = _storage.indexWhere((u) => u.id == id);
+    if (index == -1) {
+      throw NotfoundException("Not Found : $id");
+    } else {
+      _storage.remove(id);
+    }
+  }
+}
+
+// Exception Definition
+class DuplicateIdException implements Exception {
+  final String message;
+  DuplicateIdException(this.message);
+  @override
+  String toString() => message;
+}
+
+class NotfoundException implements Exception {
+  final String message;
+  NotfoundException(this.message);
+  @override
+  String toString() => message;
 }
 
 void main() {
   var repo = UserRepository();
+  // case A : Add Ok
   repo.add(User("1", "Dung", 33));
   repo.add(User("2", "Thanh", 32));
 
@@ -51,4 +86,9 @@ void main() {
   print(repo.findById("1"));
   repo.remove("1");
   print(repo.getAll());
+  // Case B : Duplicate id
+  repo.add(User("2", "Dung", 33));
+  // Case C
+  repo.findByIdOrThrow("5");
+  repo.removeOrThrow("100");
 }
